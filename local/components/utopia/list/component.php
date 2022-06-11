@@ -4,6 +4,6 @@ use Bitrix\Main\Loader;
 
 CModule::IncludeModule("utopia.core");
 
-
+$core = new Utopia\Core\CCore();
 
 $this->IncludeComponentTemplate();

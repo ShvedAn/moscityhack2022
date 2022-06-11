@@ -11,9 +11,9 @@ if (class_exists('utopia_core')) {
 }
 
 /**
- * Class capybara_core
+ * Class
  */
-Class capybara_core extends CModule {
+Class utopia_core extends CModule {
 
     var $MODULE_ID = 'utopia.core';
 
