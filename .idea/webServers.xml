@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="4998d58d-a6a6-404a-a241-cf305fbd86db" name="moscityhack2022">
+        <fileTransfer rootFolder="/home/bitrix/www" accessType="SFTP" host="2.59.42.236" port="22" sshConfigId="129a75e2-0516-438f-81e5-ebc8d819917c" sshConfig="root@2.59.42.236:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
