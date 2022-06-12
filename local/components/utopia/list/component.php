@@ -4,9 +4,13 @@ use Bitrix\Main\Loader;
 
 CModule::IncludeModule("utopia.core");
 
-//$core = new Utopia\Core\CCore();
-$core = new Utopia\Core\CParser();
+$core = new Utopia\Core\CCore();
+//$core = new Utopia\Core\CParser();
+//
 
-var_dump($core->getCurrentUser());
+//var_dump($arParams);
+
+
+$arResult['JSON'] = $core->GetElements($arParams['IBLOCK_ID']);
 
 $this->IncludeComponentTemplate();

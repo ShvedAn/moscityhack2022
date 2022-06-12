@@ -6,7 +6,7 @@ $APPLICATION->IncludeComponent(
     "utopia:list",
     "",
     array(
-        "IBLOCK_ID" => '',
+        "IBLOCK_ID" => '5',
         "MENU_CACHE_TYPE" => "N",
         "MENU_CACHE_TIME" => "3600",
         "MENU_CACHE_USE_GROUPS" => "Y",
