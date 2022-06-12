@@ -28,6 +28,9 @@ if($request->get("AGE")){
 if($request->get("REGION")){
     $param['REGION'] = $request->get("REGION");
 }
+if($request->get("FORMAT")){
+    $param['FORMAT'] = $request->get("FORMAT");
+}
 
 
 $arResult['JSON'] = $core->GetElements($arParams['IBLOCK_ID'],$param);

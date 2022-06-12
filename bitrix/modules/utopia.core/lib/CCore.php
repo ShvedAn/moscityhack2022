@@ -29,10 +29,34 @@ class CCore
     function UserSubscription($param)
     {
         // Сейчас в демо режиме используется только один пользователь. Передаем его ID в явном виде.
+        // для проверки получаем текущее значение волонтеров на мероприятии
+        $volonters = \CIBlockElement::GetProperty(
+            5,  ///@todo избавиться от прямого указания Иформационного блока.
+            $param['event'],
+            ["sort" => "asc"],
+            ["CODE" => "VOLONTER"]);
+        while ($ob = $volonters->GetNext()) {
+            $vol_id[] = $ob['VALUE'];
+        }
 
         // исключаем возможность повтоной подписки пользователя на мероприятие.
+        if (in_array($param['userid'], $vol_id) ) {
+            // Если пришла компанда отписаться
+            if($param['unsubscribe'] == 'y'){
+                unset($vol_id[array_search($param['userid'], $vol_id)]);
+            }
+        }
+        // Если валонтер не был ранее записан на акцию - добавляем
+        else{
+            array_push($vol_id, (int) $param['userid']);
+        }
 
-        return json_encode($result);
+        \CIBlockElement::SetPropertyValuesEx(
+            $param['event'],
+            5,
+            ['VOLONTER' => $vol_id]);
+
+        return json_encode($vol_id);
     }
 
     /**
@@ -44,45 +68,54 @@ class CCore
     function GetElements($IBLOCK_ID, $params = false)
     {
 
-        $arSelect = array("ID", "IBLOCK_ID", "NAME", "DATE_ACTIVE_FROM", "DETAIL_PICTURE","PROPERTY_*");
+        $arSelect = array("ID", "IBLOCK_ID", "NAME", "DATE_ACTIVE_FROM", "DETAIL_PICTURE", "PROPERTY_*");
         $arFilter = array("IBLOCK_ID" => IntVal($IBLOCK_ID),
             "ACTIVE" => "Y",
         );
         // Временный фильтр - пока не понятно какие будут итоговые требования.
         // Фильтр по тематике мероприятия
-        if($params['SUBJECT']){
-            foreach ($params['SUBJECT'] as $subj){
+        if ($params['SUBJECT']) {
+            foreach ($params['SUBJECT'] as $subj) {
                 $arFilter['=PROPERTY_SUBJECT_VALUE'][] = \CIBlockPropertyEnum::GetList(
                     [],
-                    ["IBLOCK_ID"=>$IBLOCK_ID,
-                        "XML_ID"=>$subj])->GetNext()["VALUE"];
+                    ["IBLOCK_ID" => $IBLOCK_ID,
+                        "XML_ID" => $subj])->GetNext()["VALUE"];
             }
         }
         // Фильтр по навыкам
-        if($params['SKIL']){
-            foreach ($params['SKIL'] as $skil){
+        if ($params['SKIL']) {
+            foreach ($params['SKIL'] as $skil) {
                 $arFilter['=PROPERTY_SKIL_VALUE'][] = \CIBlockPropertyEnum::GetList(
                     [],
-                    ["IBLOCK_ID"=>$IBLOCK_ID,
-                        "XML_ID"=>$skil])->GetNext()["VALUE"];
+                    ["IBLOCK_ID" => $IBLOCK_ID,
+                        "XML_ID" => $skil])->GetNext()["VALUE"];
             }
         }
         // Фильтр по возрастным группам
-        if($params['AGE']){
-            foreach ($params['AGE'] as $age){
+        if ($params['AGE']) {
+            foreach ($params['AGE'] as $age) {
                 $arFilter['=PROPERTY_AGE_VALUE'][] = \CIBlockPropertyEnum::GetList(
                     [],
-                    ["IBLOCK_ID"=>$IBLOCK_ID,
-                        "XML_ID"=>$age])->GetNext()["VALUE"];
+                    ["IBLOCK_ID" => $IBLOCK_ID,
+                        "XML_ID" => $age])->GetNext()["VALUE"];
             }
         }
         // Фильтр по районам города
-        if($params['REGION']){
-            foreach ($params['REGION'] as $region){
+        if ($params['REGION']) {
+            foreach ($params['REGION'] as $region) {
                 $arFilter['=PROPERTY_REGION_VALUE'][] = \CIBlockPropertyEnum::GetList(
                     [],
-                    ["IBLOCK_ID"=>$IBLOCK_ID,
-                        "XML_ID"=>$region])->GetNext()["VALUE"];
+                    ["IBLOCK_ID" => $IBLOCK_ID,
+                        "XML_ID" => $region])->GetNext()["VALUE"];
+            }
+        }
+        // Фильтр по типу мероприятия Офлайн/Онлайн
+        if ($params['FORMAT']) {
+            foreach ($params['FORMAT'] as $region) {
+                $arFilter['=PROPERTY_FORMAT_VALUE'][] = \CIBlockPropertyEnum::GetList(
+                    [],
+                    ["IBLOCK_ID" => $IBLOCK_ID,
+                        "XML_ID" => $region])->GetNext()["VALUE"];
             }
         }
 
@@ -113,24 +146,21 @@ class CCore
         $arFilter = array("IBLOCK_ID" => IntVal($IBLOCK_ID),
             "ACTIVE" => "Y",
         );
-        if($params['SUBJECT']){
-            $arFilter['=PROPERTY_SUBJECT_VALUE'] = \CIBlockPropertyEnum::GetList(Array(),
-                Array("IBLOCK_ID"=>$IBLOCK_ID, "XML_ID"=>$params['SUBJECT']))->GetNext()["VALUE"];
+        if ($params['SUBJECT']) {
+            $arFilter['=PROPERTY_SUBJECT_VALUE'] = \CIBlockPropertyEnum::GetList(array(),
+                array("IBLOCK_ID" => $IBLOCK_ID, "XML_ID" => $params['SUBJECT']))->GetNext()["VALUE"];
         }
 
 
-        $res = \CIBlockElement::GetList(array(), $arFilter, false, array("nPageSize" => 50), $arSelect);
+        $res = \CIBlockElement::GetList([], $arFilter, false, array("nPageSize" => 50), $arSelect);
         while ($ob = $res->GetNextElement()) {
             $arFields = $ob->GetFields();
             $result[$arFields['ID']]['Fields'] = $arFields;
             // Формируем детальную ссылку на изображение
             $result[$arFields['ID']]['Fields']["DETAIL_PICTURE"] = \CFile::GetFileArray($arFields["DETAIL_PICTURE"])['SRC'];
-//            print_r($arFields);
             $arProps = $ob->GetProperties();
-//            print_r($arProps);
             $result[$arFields['ID']]['Props'] = $arProps;
         }
-//var_dump($result);
 
         return json_encode($result);
     }

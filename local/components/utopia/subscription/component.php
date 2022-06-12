@@ -16,22 +16,17 @@ $core = new Utopia\Core\CCore();
 // Методами CMF получаем безопасные данные из $_REQUEST
 $request = Context::getCurrent()->getRequest();
 
-var_dump($request->get("SUBJECT"));
-
-
-
-
-
-// Отладка фильтрации элементов
-if($request->get("SUBJECT")){
-    $param['SUBJECT'] = $request->get("SUBJECT");
+// Проверка параметров подписки
+if($request->get("event")){
+    $param['event'] = $request->get("event");
+}
+if($request->get("unsubscribe")){
+    $param['unsubscribe'] = $request->get("unsubscribe");
+}
+if($request->get("userid")){
+    $param['userid'] = $request->get("userid");
 }
 
-$arResult['JSON'] = $core->GetElementsTest($arParams['IBLOCK_ID'],$param);
-
-var_dump(json_decode($arResult['JSON']));
-
-
-//$arResult['JSON'] = $core->GetElements($arParams['IBLOCK_ID']);
+$arResult['JSON'] = $core->UserSubscription($param);
 
 $this->IncludeComponentTemplate();
