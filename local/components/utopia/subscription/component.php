@@ -13,10 +13,10 @@ $core = new Utopia\Core\CCore();
 //$core = new Utopia\Core\CParser();
 //
 
-// Ìåòîäàìè CMF ïîëó÷àåì áåçîïàñíûå äàííûå èç $_REQUEST
+// ĞœĞµÑ‚Ğ¾Ğ´Ğ°Ğ¼Ğ¸ CMF Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ°ĞµĞ¼ Ğ±ĞµĞ·Ğ¾Ğ¿Ğ°ÑĞ½Ñ‹Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ¸Ğ· $_REQUEST
 $request = Context::getCurrent()->getRequest();
 
-// Ïğîâåğêà ïàğàìåòğîâ ïîäïèñêè
+// ĞŸÑ€Ğ¾Ğ²ĞµÑ€ĞºĞ° Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ğ¾Ğ² Ğ¿Ğ¾Ğ´Ğ¿Ğ¸ÑĞºĞ¸
 if($request->get("event")){
     $param['event'] = $request->get("event");
 }
