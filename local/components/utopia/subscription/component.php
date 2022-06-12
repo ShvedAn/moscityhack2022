@@ -10,8 +10,6 @@ CModule::IncludeModule("utopia.core");
 CModule::IncludeModule("main");
 
 $core = new Utopia\Core\CCore();
-//$core = new Utopia\Core\CParser();
-//
 
 // Методами CMF получаем безопасные данные из $_REQUEST
 $request = Context::getCurrent()->getRequest();
