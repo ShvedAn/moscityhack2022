@@ -10,7 +10,7 @@ Loader::includeModule("Module");
 
 
 /**
- * класс
+ * Основной класс с фуникциями API
  */
 class CCore
 {
@@ -22,9 +22,10 @@ class CCore
     }
 
     /**
-     * Подписка и отписка пользователя на мероприятие.
      * @param $param
      * @return false|string
+     * @todo метод работает через GET запрос - нужно переделать на POST. Избежать мутации.
+     * Подписка и отписка пользователя на мероприятие.
      */
     function UserSubscription($param)
     {
@@ -40,15 +41,14 @@ class CCore
         }
 
         // исключаем возможность повтоной подписки пользователя на мероприятие.
-        if (in_array($param['userid'], $vol_id) ) {
+        if (in_array($param['userid'], $vol_id)) {
             // Если пришла компанда отписаться
-            if($param['unsubscribe'] == 'y'){
+            if ($param['unsubscribe'] == 'y') {
                 unset($vol_id[array_search($param['userid'], $vol_id)]);
             }
-        }
-        // Если валонтер не был ранее записан на акцию - добавляем
-        else{
-            array_push($vol_id, (int) $param['userid']);
+        } // Если валонтер не был ранее записан на акцию - добавляем
+        else {
+            array_push($vol_id, (int)$param['userid']);
         }
 
         \CIBlockElement::SetPropertyValuesEx(
@@ -67,11 +67,19 @@ class CCore
      */
     function GetElements($IBLOCK_ID, $params = false)
     {
-
-        $arSelect = array("ID", "IBLOCK_ID", "NAME", "DATE_ACTIVE_FROM", "DETAIL_PICTURE", "PROPERTY_*");
-        $arFilter = array("IBLOCK_ID" => IntVal($IBLOCK_ID),
+        $arSelect = [
+            "ID",
+            "IBLOCK_ID",
+            "NAME",
+            "DATE_ACTIVE_FROM",
+            "DETAIL_PICTURE",
+            "PROPERTY_*"];
+        $arFilter = [
+            "IBLOCK_ID" => IntVal($IBLOCK_ID),
             "ACTIVE" => "Y",
-        );
+            'PROPERTY_VOLONTER' => $params['USER_ID'], ///@todo заметь на метод получения текущено ID (после хакатона)
+            'PROPERTY_ADMIN' => $params['ORG_ID'] ///@todo заметь на метод получения текущено ID (после хакатона)
+        ];
         // Временный фильтр - пока не понятно какие будут итоговые требования.
         // Фильтр по тематике мероприятия
         if ($params['SUBJECT']) {
@@ -119,7 +127,12 @@ class CCore
             }
         }
 
-        $res = \CIBlockElement::GetList(array(), $arFilter, false, array("nPageSize" => 50), $arSelect);
+        $res = \CIBlockElement::GetList([],
+            $arFilter,
+            false,
+            ["nPageSize" => 50],
+            $arSelect
+        );
         while ($ob = $res->GetNextElement()) {
             $arFields = $ob->GetFields();
             $result[$arFields['ID']]['Fields'] = $arFields;
@@ -141,18 +154,30 @@ class CCore
      */
     function GetElementsTest($IBLOCK_ID, $params = false)
     {
-
-        $arSelect = array("ID", "IBLOCK_ID", "NAME", "DATE_ACTIVE_FROM", "DETAIL_PICTURE", "PROPERTY_*");
-        $arFilter = array("IBLOCK_ID" => IntVal($IBLOCK_ID),
+        $arSelect = [
+            "ID",
+            "IBLOCK_ID",
+            "NAME",
+            "DATE_ACTIVE_FROM",
+            "DETAIL_PICTURE",
+            "PROPERTY_*"
+        ];
+        $arFilter = [
+            "IBLOCK_ID" => IntVal($IBLOCK_ID),
             "ACTIVE" => "Y",
-        );
+        ];
         if ($params['SUBJECT']) {
             $arFilter['=PROPERTY_SUBJECT_VALUE'] = \CIBlockPropertyEnum::GetList(array(),
-                array("IBLOCK_ID" => $IBLOCK_ID, "XML_ID" => $params['SUBJECT']))->GetNext()["VALUE"];
+                ["IBLOCK_ID" => $IBLOCK_ID, "XML_ID" => $params['SUBJECT']])->GetNext()["VALUE"];
         }
 
-
-        $res = \CIBlockElement::GetList([], $arFilter, false, array("nPageSize" => 50), $arSelect);
+        $res = \CIBlockElement::GetList(
+            [],
+            $arFilter,
+            false,
+            ["nPageSize" => 50],
+            $arSelect
+        );
         while ($ob = $res->GetNextElement()) {
             $arFields = $ob->GetFields();
             $result[$arFields['ID']]['Fields'] = $arFields;
@@ -180,19 +205,17 @@ class CCore
         $arTranslitParams = array("replace_space" => "-", "replace_other" => "-");
         $CODE = \Cutil::translit(strtolower($param['NAME']), "ru", $arTranslitParams);
 
-        $arLoadProductArray = array(
+        $arLoadProductArray = [
             'MODIFIED_BY' => 1, // элемент изменен текущим пользователем
             'IBLOCK_SECTION_ID' => false, // элемент лежит в корне раздела
             'IBLOCK_ID' => $IBLOCK_ID,
             'CODE' => $CODE,
             'PROPERTY_VALUES' => $param['PROP'],
             'NAME' => $param['NAME'],
-            'ACTIVE' => 'Y', // активен
+            'ACTIVE' => 'Y',
             'PREVIEW_TEXT' => 'текст для списка элементов',
-            'DETAIL_TEXT' => '
-            ',
-
-        );
+            'DETAIL_TEXT' => ' ',
+        ];
 
         if ($PRODUCT_ID = $el->Add($arLoadProductArray)) {
             echo 'New ID: ' . $PRODUCT_ID;
@@ -242,7 +265,7 @@ class CCore
 
         $arUser = $rsUser->Fetch();
         $arUserFields['UF_USER_TYPE'] = $arUser['UF_USER_TYPE'];
-        $arUserFields['UF_ROLES'] = $arUser['UF_ROLES']; // false - основной, 5 - сотрудник
+        $arUserFields['UF_ROLES'] = $arUser['UF_ROLES'];
 
         return $arUserFields;
 
@@ -251,7 +274,11 @@ class CCore
 
     public function GetListInfo()
     {
-        $filter = array("IBLOCK_ID" => 5, "ACTIVE" => "Y", "PROPERTY_USER_STAFF" => '**');
+        $filter = [
+            "IBLOCK_ID" => 5,
+            "ACTIVE" => "Y",
+            "PROPERTY_USER_STAFF" => '**'
+        ];
 
         $res = \CIBlockElement::GetList(
             [],
@@ -269,6 +296,5 @@ class CCore
         }
 
         return $result;
-
     }
 }
