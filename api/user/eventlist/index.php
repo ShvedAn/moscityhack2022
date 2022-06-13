@@ -7,7 +7,7 @@ $APPLICATION->IncludeComponent(
     "",
     array(
         "IBLOCK_ID" => '5',
-        "USER_ID" => 2, // временная заглушка, так как в демо режиме работаем из под одного пользователя
+        "USER_ID" => 3, // временная заглушка, так как в демо режиме работаем из под одного пользователя
         "MENU_CACHE_TYPE" => "N",
         "MENU_CACHE_TIME" => "3600",
         "MENU_CACHE_USE_GROUPS" => "Y",
