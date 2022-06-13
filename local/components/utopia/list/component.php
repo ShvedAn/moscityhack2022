@@ -32,15 +32,11 @@ if($request->get("FORMAT")){
     $param['FORMAT'] = $request->get("FORMAT");
 }
 
-//var_dump($arParams);
-
 $param['USER_ID'] = $arParams['USER_ID'];
 $param['ORG_ID'] = $arParams['ORG_ID'];
 
 // Если в параметрах компонента передается ID пользователя - значит нужно вернуть список мроприятий
 // на которые подписался пользователь
-
-
 $arResult['JSON'] = $core->GetElements($arParams['IBLOCK_ID'],$param);
 
 $this->IncludeComponentTemplate();

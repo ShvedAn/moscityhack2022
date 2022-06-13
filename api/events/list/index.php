@@ -10,7 +10,6 @@ $APPLICATION->IncludeComponent(
         "MENU_CACHE_TYPE" => "N",
         "MENU_CACHE_TIME" => "3600",
         "MENU_CACHE_USE_GROUPS" => "Y",
-
     ),
     false
 );
